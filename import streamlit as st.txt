@@ -1,0 +1,76 @@
+import streamlit as st
+import numpy as np
+import joblib
+
+# Load model and scaler
+model = joblib.load("model.pkl")
+scaler = joblib.load("scaler.pkl")
+
+# Set page settings
+st.set_page_config(
+    page_title="Heart Health Predictor 🫀",
+    page_icon="🫀",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
+# Sidebar
+st.sidebar.title("Patient Information")
+st.sidebar.markdown("Fill the details carefully!")
+
+# Input Fields
+age = st.sidebar.slider("🧓 Age (years)", 20, 90, 50)
+height = st.sidebar.number_input("📏 Height (cm)", 100, 250, 170)
+weight = st.sidebar.number_input("⚖️ Weight (kg)", 30, 200, 70)
+systolic = st.sidebar.number_input("🩸 Systolic Blood Pressure", 90, 200, 120)
+diastolic = st.sidebar.number_input("🩸 Diastolic Blood Pressure", 60, 140, 80)
+chol = st.sidebar.radio("🧪 Cholesterol Level", [1, 2, 3], format_func=lambda x: {1: "Normal", 2: "Above Normal", 3: "Well Above Normal"}[x])
+glucose = st.sidebar.radio("🍬 Glucose Level", [1, 2, 3], format_func=lambda x: {1: "Normal", 2: "Above Normal", 3: "Well Above Normal"}[x])
+smoke = st.sidebar.radio("🚬 Smoker?", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No")
+alcohol = st.sidebar.radio("🍷 Alcohol Intake?", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No")
+active = st.sidebar.radio("🏃‍♂️ Physically Active?", [0, 1], format_func=lambda x: "Yes" if x == 1 else "No")
+
+# Background Title
+st.markdown(
+    """
+    <div style="text-align: center; margin-top: -50px;">
+        <h1 style="font-size: 3.5em; color: #d7263d;">Cardiovascular Disease Risk Predictor</h1>
+        <p style="font-size: 1.5em; color: #2e86de;">Predict your heart health with AI 🚀</p>
+    </div>
+    """, unsafe_allow_html=True
+)
+
+# Main Prediction Button
+inputs = np.array([[age, height, weight, systolic, diastolic, chol, glucose, smoke, alcohol, active]])
+
+col1, col2, col3 = st.columns([1,2,1])
+
+with col2:
+    if st.button("🔮 Predict My Heart Risk", use_container_width=True):
+        scaled = scaler.transform(inputs)
+        prediction = model.predict(scaled)[0]
+        probability = model.predict_proba(scaled)[0][1]
+        
+        if prediction == 1:
+            st.error(
+                f"🚨 **High Risk of Cardiovascular Disease!** \n\nProbability: **{probability:.2%}**",
+                icon="⚠️"
+            )
+            st.markdown("<h3 style='color: red;'>⚠️ Consult a doctor immediately!</h3>", unsafe_allow_html=True)
+        else:
+            st.success(
+                f"🎉 **Low Risk of Cardiovascular Disease!** \n\nProbability: **{probability:.2%}**",
+                icon="✅"
+            )
+            st.markdown("<h3 style='color: green;'>💚 Keep maintaining a healthy lifestyle!</h3>", unsafe_allow_html=True)
+
+# Footer
+st.markdown(
+    """
+    <hr style="border: 1px solid #eee;">
+    <div style="text-align: center; font-size: 0.9em;">
+        Made with ❤️ by [Your Name Here]
+    </div>
+    """,
+    unsafe_allow_html=True
+)

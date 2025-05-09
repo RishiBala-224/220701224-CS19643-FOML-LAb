@@ -1,0 +1,4 @@
+age,height,weight,systolic_bp,diastolic_bp,cholesterol,glucose,smoking,alcohol,active,target
+50,170,75,130,80,2,1,0,0,1,1
+45,165,65,120,70,1,1,0,0,1,0
+60,175,90,140,90,3,2,1,1,0,1
